@@ -1,0 +1,37 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: redditfornormies-pipeline
+  namespace: {{ .Values.namespace }}
+spec:
+  resources:
+  - name: redditfornormies-git
+    type: git
+  - name: redditfornormies-image
+    type: image
+  tasks:
+  - name: build-s2i
+    taskRef:
+      name: s2i-nodejs-12
+      kind: ClusterTask
+    params:
+      - name: TLSVERIFY
+        value: "false"
+    resources:
+      inputs:
+      - name: source
+        resource: redditfornormies-git
+      outputs:
+      - name: image
+        resource: redditfornormies-image
+  - name: deploy-to-cluster
+    runAfter:
+     - build-s2i
+    taskRef:
+      name: deploy-using-kubectl
+      kind: Task
+
+
+
+
+

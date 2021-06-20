@@ -1,0 +1,40 @@
+# Default values for rfnchart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 2
+
+nameOverride: ""
+fullnameOverride: ""
+
+namespace: rfn
+deployName: redditfornormies
+
+dockerLogin:
+ username: amiharsh
+ password: a1b2c3d4e5
+
+steps:
+ kubectlImageName: lachlanevenson/k8s-kubectl
+
+pipelinerun:
+ gitUrl: https://github.com/amiharsh/redditfornormies
+ imageName: docker.io/amiharsh/redditfornormies
+ pullImageName: amiharsh/redditfornormies
+
+service:
+ type: NodePort
+ targetPort: 8080
+ svcPort: 80
+
+images:
+ stiImageName: quay.io/openshift-pipeline/s2i
+ builderImageName: docker.io/nodeshift/ubi8-s2i-web-app:latest
+ buildahImageName: quay.io/buildah/stable
+
+
+ingress:
+ host: redditfornormies.ga
+ path: /
+ serviceName: redditfornormies
+ servicePort: 80

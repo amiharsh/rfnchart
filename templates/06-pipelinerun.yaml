@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: redditfornormies-pr
+  namespace: {{ .Values.namespace }}
+  annotations:
+   "helm.sh/hook": post-install
+spec:
+  pipelineRef:
+    name: redditfornormies-pipeline
+  serviceAccountName: pipeline-account
+  resources:
+    - name: redditfornormies-image
+      resourceSpec:
+       type: image
+       params:
+       - name: url
+         value: {{ .Values.pipelinerun.imageName }}
+    - name: redditfornormies-git
+      resourceSpec:
+       type: git
+       params:
+       - name: url
+         value: {{ .Values.pipelinerun.gitUrl }}

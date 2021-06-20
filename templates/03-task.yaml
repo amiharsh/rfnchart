@@ -1,0 +1,47 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: deploy-using-kubectl
+  namespace: {{ .Values.namespace }}
+spec:
+ params:
+ - name: imageName
+   type: string
+   default: {{ .Values.pipelinerun.pullImageName }}
+ - name: replicaCount
+   type: string
+   default: {{ quote .Values.replicaCount }}
+ - name: deployName
+   type:  string
+   default: {{ .Values.deployName }}
+ - name: serviceType
+   type: string
+   default: {{ .Values.service.type }}
+ - name: targetPort
+   type: string
+   default: {{ quote .Values.service.targetPort }}
+ - name: svcPort
+   type: string
+   default: {{ quote .Values.service.svcPort }}
+
+ steps:
+ - name: run-pod
+   image:  {{ .Values.steps.kubectlImageName }}
+   command: ["kubectl"]
+   args:
+   - "create"
+   - "deploy"
+   - "$(params.deployName)"
+   - "--image=$(params.imageName)"
+   - "--replicas=$(params.replicaCount)"
+ - name: expose-deploy
+   image: {{ .Values.steps.kubectlImageName }}
+   command:  ["kubectl"]
+   args:
+   - "expose"
+   - "deploy"
+   - "$(params.deployName)"
+   - "--type=$(params.serviceType)"
+   - "--target-port=$(params.targetPort)"
+   - "--port=$(params.svcPort)"
+
